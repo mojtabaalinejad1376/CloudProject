@@ -45,4 +45,20 @@ class RegisterController extends BaseController
 
         return $this->sendResponse($success, 'کاربر جدید ثبت شد');
     }
+
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required',
+            'password' => 'required',
+        ],
+            [
+                'phone.required' => 'لطفا شماره تلفن را وارد نماييد',
+                'password.required' => 'لطفا رمز عبور را وارد نماييد',
+            ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+        }
+    }
 }
