@@ -71,4 +71,27 @@ class RegisterController extends BaseController
             return $this->sendError('کاربر یافت نشد', ['error' => 'کاربر یافت نشد']);
         }
     }
+
+    public function changeProfile(Request $request)
+    {
+        $user = User::where('phone', $request->phone)->first();
+        if(isset($user)) {
+            $id = $user['id'];
+            if (isset($request->first_name))
+                $user['first_name'] = $request->first_name;
+            if (isset($request->last_name))
+                $user['last_name'] = $request->last_name;
+            if (isset($request->new_phone))
+                $user['phone'] = $request->new_phone;
+            $edit = User::whereId($id)->update([
+                'first_name' => $user['first_name'],
+                'last_name' => $user['last_name'],
+                'phone' => $user['phone']
+            ]);
+            return $this->sendResponse($user, 'ویرایش با موفقیت انجام شد');
+        }
+        else {
+            return $this->sendError('کاربر یافت نشد', ['error' => 'کاربر یافت نشد']);
+        }
+    }
 }
