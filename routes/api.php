@@ -21,4 +21,4 @@ use App\Http\Controllers\API\RegisterController;
 //    return $request->user();
 //});
 
-
+Route::post('register', [RegisterController::class, 'register']);
