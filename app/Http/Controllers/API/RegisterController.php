@@ -60,5 +60,15 @@ class RegisterController extends BaseController
         if ($validator->fails()) {
             return $this->sendError('خطا اعتبارسنجی', $validator->errors());
         }
+
+        if(Auth::attempt(['phone' => $request['phone'], 'password' => $request['password']])){
+            $user = Auth::user();
+            $success['token'] =  $user->createToken('register')->accessToken;
+            $success['name'] =  $user['first_name'].' '.$user['last_name'];
+            return $this->sendResponse($success, 'ورود با موفقیت انجام شد');
+        }
+        else {
+            return $this->sendError('کاربر یافت نشد', ['error' => 'کاربر یافت نشد']);
+        }
     }
 }
