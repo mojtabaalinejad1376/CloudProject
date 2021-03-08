@@ -94,4 +94,32 @@ class RegisterController extends BaseController
             return $this->sendError('کاربر یافت نشد', ['error' => 'کاربر یافت نشد']);
         }
     }
+
+    public function changePassword(Request $request)
+    {
+        $user = User::where('phone', $request->phone)->first();
+        if(isset($user)) {
+            $validator = Validator::make($request->all(), [
+                'password' => 'required|min:8',
+                'confirm_password' => 'required|same:password'
+            ],
+                [
+                    'password.required' => 'لطفا رمز عبور جدید را وارد نماييد',
+                    'password.min' => 'رمز عبور نبايد كمتر از 8 كاراكتر باشد',
+                    'confirm_password.required' => 'لطفا تكرار رمز عبور را وارد نماييد',
+                    'confirm_password.same' => 'رمز عبور مطابقت ندارد',
+                ]);
+
+            if($validator->fails()){
+                return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+            }
+            $user = User::whereId($user['id'])->update([
+                'password' => bcrypt($request['password']),
+            ]);
+            return $this->sendResponse($user, 'تغییر رمز عبور با موفقیت انجام شد');
+        }
+        else {
+            return $this->sendError('کاربر یافت نشد', ['error' => 'کاربر یافت نشد']);
+        }
+    }
 }
