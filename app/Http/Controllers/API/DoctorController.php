@@ -72,5 +72,13 @@ class DoctorController extends BaseController
             else
                 return $this->sendError('پزشکی در شهر '. $request['city'] .' یافت نشد.', 'پزشکی در شهر '. $request['city'] .' یافت نشد.');
         }
+        elseif (isset($request['speciality']))
+        {
+            $doctor = Doctor::whereSpeciality($request['speciality'])->get();
+            if (isset($doctor))
+                return $this->sendResponse($doctor, 'پزشک با تخصص کاری '. $request['speciality'] .' یافت شد.');
+            else
+                return $this->sendError('پزشکی با تخصص کاری '. $request['speciality'] .' یافت نشد.', 'پزشکی با تخصص کاری '. $request['speciality'] .' یافت نشد.');
+        }
     }
 }
