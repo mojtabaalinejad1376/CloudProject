@@ -10,16 +10,6 @@ use Illuminate\Support\Facades\Validator;
 class DoctorController extends BaseController
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -28,7 +18,7 @@ class DoctorController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
-            'nezam_number' => 'required|numeric',
+            'nezam_number' => 'required|numeric|unique:App\Models\Doctor',
             'city' => 'required|string',
             'address' => 'required|string',
             'phone' => 'required|numeric',
@@ -40,6 +30,7 @@ class DoctorController extends BaseController
                 'name.string' => 'لطفا نام را به صورت رشته وارد نماييد',
                 'nezam_number.required' => 'لطفا شماره نظام را وارد نماييد',
                 'nezam_number.numeric' => 'لطفا شماره نظام را به صورت عددی وارد نماييد',
+                'nezam_number.unique' => 'شماره نظام قبلا ثبت شده است',
                 'city.required' => 'لطفا شهر را وارد نماييد',
                 'city.string' => 'لطفا شهر را به صورت رشته وارد نماييد',
                 'address.required' => 'لطفا آدرس را وارد نماييد',
@@ -58,39 +49,6 @@ class DoctorController extends BaseController
 
         $doctor = Doctor::create($request->all());
         return $this->sendResponse($doctor, 'دکتر '. $doctor['name'] .' ثبت شد');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Doctor  $doctor
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Doctor $doctor)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Doctor  $doctor
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Doctor $doctor)
-    {
-        //
     }
 
     /**
