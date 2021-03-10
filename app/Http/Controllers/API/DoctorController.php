@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Validator;
 
 class DoctorController extends BaseController
 {
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -51,26 +46,15 @@ class DoctorController extends BaseController
         return $this->sendResponse($doctor, 'دکتر '. $doctor['name'] .' ثبت شد');
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Doctor  $doctor
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Doctor $doctor)
+    public function filter(Request $request)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Doctor  $doctor
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Doctor $doctor)
-    {
-        //
+        if (isset($request['name']))
+        {
+            $doctor = Doctor::whereName($request['name'])->first();
+            if (isset($doctor))
+                return $this->sendResponse($doctor, 'دکتر '. $doctor['name'] .' یافت شد.');
+            else
+                return $this->sendError('پزشکی با نام '. $request['name'] .' یافت نشد.', 'پزشکی با نام '. $request['name'] .' یافت نشد.');
+        }
     }
 }
