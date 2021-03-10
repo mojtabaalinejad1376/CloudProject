@@ -64,5 +64,13 @@ class DoctorController extends BaseController
             else
                 return $this->sendError('پزشکی با شماره نظام '. $request['nezam_number'] .' یافت نشد.', 'پزشکی با شماره نظام '. $request['nezam_number'] .' یافت نشد.');
         }
+        elseif (isset($request['city']))
+        {
+            $doctor = Doctor::whereCity($request['city'])->get();
+            if (isset($doctor))
+                return $this->sendResponse($doctor, 'پزشک در شهر '. $request['city'] .' یافت شد.');
+            else
+                return $this->sendError('پزشکی در شهر '. $request['city'] .' یافت نشد.', 'پزشکی در شهر '. $request['city'] .' یافت نشد.');
+        }
     }
 }
