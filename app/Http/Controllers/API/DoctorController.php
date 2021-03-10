@@ -56,5 +56,13 @@ class DoctorController extends BaseController
             else
                 return $this->sendError('پزشکی با نام '. $request['name'] .' یافت نشد.', 'پزشکی با نام '. $request['name'] .' یافت نشد.');
         }
+        elseif (isset($request['nezam_number']))
+        {
+            $doctor = Doctor::where('nezam_number', $request['nezam_number'])->first();
+            if (isset($doctor))
+                return $this->sendResponse($doctor, 'دکتر '. $doctor['name'] .' با شماره نظام '. $request['nezam_number'] .' یافت شد.');
+            else
+                return $this->sendError('پزشکی با شماره نظام '. $request['nezam_number'] .' یافت نشد.', 'پزشکی با شماره نظام '. $request['nezam_number'] .' یافت نشد.');
+        }
     }
 }
