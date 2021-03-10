@@ -43,7 +43,7 @@ class RegisterController extends BaseController
         $success['token'] =  $user->createToken('register')->accessToken;
         $success['name'] =  $user->first_name.' '.$user->last_name;
 
-        return $this->sendResponse($success, 'کاربر جدید ثبت شد');
+        return $this->sendResponse($success, 'کاربر '. $success['name'] .' ثبت شد');
     }
 
     public function login(Request $request)
@@ -113,6 +113,7 @@ class RegisterController extends BaseController
             if($validator->fails()){
                 return $this->sendError('خطا اعتبارسنجی', $validator->errors());
             }
+
             $user = User::whereId($user['id'])->update([
                 'password' => bcrypt($request['password']),
             ]);
