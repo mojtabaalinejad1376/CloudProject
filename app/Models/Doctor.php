@@ -13,6 +13,8 @@ class Doctor extends Model
         'name',
         'nezam_number',
         'city',
+        'address',
+        'phone',
         'speciality',
         'degree',
     ];

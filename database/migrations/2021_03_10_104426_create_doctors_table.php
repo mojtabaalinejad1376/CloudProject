@@ -18,6 +18,8 @@ class CreateDoctorsTable extends Migration
             $table->string('name');
             $table->string('nezam_number');
             $table->string('city');
+            $table->string('address');
+            $table->string('phone');
             $table->string('speciality');
             $table->string('degree');
             $table->timestamps();
