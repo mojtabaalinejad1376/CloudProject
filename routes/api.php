@@ -27,3 +27,4 @@ Route::post('login', [RegisterController::class, 'login']);
 Route::post('change-profile', [RegisterController::class, 'changeProfile']);
 Route::post('change-password', [RegisterController::class, 'changePassword']);
 Route::post('create-doctor', [DoctorController::class, 'create']);
+Route::post('filter-doctor', [DoctorController::class, 'filter']);
