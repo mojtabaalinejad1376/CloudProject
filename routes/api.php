@@ -29,4 +29,5 @@ Route::post('change-profile', [RegisterController::class, 'changeProfile']);
 Route::post('change-password', [RegisterController::class, 'changePassword']);
 Route::post('create-doctor', [DoctorController::class, 'create']);
 Route::post('filter-doctor', [RegisterController::class, 'filter']);
-Route::post('create_visit_time', [VisitTimeController::class, 'create_visit_time']);
+Route::post('create-visit-time', [VisitTimeController::class, 'create_visit_time']);
+Route::post('show-visit-time', [DoctorController::class, 'show_visit_time']);
