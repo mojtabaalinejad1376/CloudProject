@@ -18,8 +18,7 @@ class CreateVisitTimeTable extends Migration
             $table->string('year');
             $table->string('month');
             $table->string('day');
-            $table->unsignedBigInteger('doctor_id');
-            $table->foreign('doctor_id')->references('id')->on('doctor');
+            $table->foreignId('doctor_id')->constrained();
             $table->timestamps();
         });
     }
