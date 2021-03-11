@@ -8,6 +8,7 @@ use App\Models\VisitTime;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends BaseController
@@ -207,5 +208,34 @@ class RegisterController extends BaseController
         }
         else
             return $this->sendError('زمان ویزیت با آیدی '. $request['visit_id'] .' قبلا رزرو شده است.', 'زمان ویزیت با آیدی '. $request['visit_id'] .' قبلا رزرو شده است.');
+    }
+
+    public function show_request_visit(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|numeric|min:11',
+        ],
+            [
+                'phone.required' => 'لطفا شماره تلفن را وارد نماييد',
+                'phone.numeric' => 'لطفا شماره تلفن را به صورت عددی وارد نماييد',
+                'phone.min' => 'شماره تلفن نباید کمتر از 10 رقم باشد',
+            ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+        }
+
+        $user_id = User::wherePhone($request['phone'])->first();
+        if (is_null($user_id))
+            return $this->sendError('کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.', 'کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.');
+
+        $show = DB::table('requests')
+            ->join('users', 'requests.user_id', '=', 'users.id')
+            ->join('visit_time', 'requests.visit_id', '=', 'visit_time.id')
+            ->join('doctors', 'visit_time.doctor_id', '=', 'doctors.id')
+            ->where('requests.user_id', '=', $user_id['id'])
+            ->select('users.first_name', 'users.last_name', 'visit_time.year', 'visit_time.month', 'visit_time.day', 'visit_time.hour', 'doctors.name as doctor_name')
+            ->get();
+        return $this->sendResponse($show, 'زمان های ویزیت رزرو شده برای کاربر '.$user_id['first_name'] .' '. $user_id['last_name'] .' یافت شد.');
     }
 }
