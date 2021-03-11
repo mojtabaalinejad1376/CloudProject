@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Doctor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
@@ -121,6 +122,50 @@ class RegisterController extends BaseController
         }
         else {
             return $this->sendError('کاربر یافت نشد', ['error' => 'کاربر یافت نشد']);
+        }
+    }
+
+    public function filter(Request $request)
+    {
+        if (isset($request['name']))
+        {
+            $doctor = Doctor::where('name','LIKE','%'.$request['name'].'%')->first();
+            if (isset($doctor))
+                return $this->sendResponse($doctor, 'دکتر '. $doctor['name'] .' یافت شد.');
+            else
+                return $this->sendError('پزشکی با نام '. $request['name'] .' یافت نشد.', 'پزشکی با نام '. $request['name'] .' یافت نشد.');
+        }
+        elseif (isset($request['nezam_number']))
+        {
+            $doctor = Doctor::where('nezam_number', $request['nezam_number'])->first();
+            if (isset($doctor))
+                return $this->sendResponse($doctor, 'دکتر '. $doctor['name'] .' با شماره نظام '. $request['nezam_number'] .' یافت شد.');
+            else
+                return $this->sendError('پزشکی با شماره نظام '. $request['nezam_number'] .' یافت نشد.', 'پزشکی با شماره نظام '. $request['nezam_number'] .' یافت نشد.');
+        }
+        elseif (isset($request['city']))
+        {
+            $doctor = Doctor::whereCity($request['city'])->get();
+            if (isset($doctor))
+                return $this->sendResponse($doctor, 'پزشک در شهر '. $request['city'] .' یافت شد.');
+            else
+                return $this->sendError('پزشکی در شهر '. $request['city'] .' یافت نشد.', 'پزشکی در شهر '. $request['city'] .' یافت نشد.');
+        }
+        elseif (isset($request['speciality']))
+        {
+            $doctor = Doctor::where('speciality','LIKE','%'.$request['speciality'].'%')->get();
+            if (isset($doctor))
+                return $this->sendResponse($doctor, 'پزشک با تخصص کاری '. $request['speciality'] .' یافت شد.');
+            else
+                return $this->sendError('پزشکی با تخصص کاری '. $request['speciality'] .' یافت نشد.', 'پزشکی با تخصص کاری '. $request['speciality'] .' یافت نشد.');
+        }
+        elseif (isset($request['degree']))
+        {
+            $doctor = Doctor::where('degree','LIKE','%'.$request['degree'].'%')->get();
+            if (isset($doctor))
+                return $this->sendResponse($doctor, 'پزشک با مدرک تحصیلی '. $request['degree'] .' یافت شد.');
+            else
+                return $this->sendError('پزشکی با مدرک تحصیلی '. $request['degree'] .' یافت نشد.', 'پزشکی با مدرک تحصیلی '. $request['degree'] .' یافت نشد.');
         }
     }
 }
