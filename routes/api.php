@@ -36,3 +36,4 @@ Route::post('show-user-visit', [RegisterController::class, 'show_request_visit']
 Route::post('create-favourite', [RegisterController::class, 'favourite']);
 Route::post('show-favourite', [RegisterController::class, 'show_favourite']);
 Route::post('create-comment', [RegisterController::class, 'comment']);
+Route::post('show-doctor-comment', [RegisterController::class, 'show_doctor_comment']);

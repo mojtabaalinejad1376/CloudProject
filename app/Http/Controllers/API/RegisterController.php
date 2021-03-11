@@ -345,4 +345,31 @@ class RegisterController extends BaseController
         ]);
         return $this->sendResponse('نظر شما با موفقیت ثبت شد.', 'نظر کاربر '.$user_id['first_name'] .' '. $user_id['last_name'] .' برای دکتر '. $doctor_id['name'] .' با موفقیت اضافه شد.');
     }
+
+    public function show_doctor_comment(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'doctor_name' => 'required|string',
+        ],
+            [
+                'doctor_name.required' => 'لطفا نام پزشک را وارد نماييد',
+                'doctor_name.string' => 'لطفا نام کامل پزشک را به صورت رشته وارد نماييد',
+            ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+        }
+
+        $doctor_id = Doctor::whereName($request['doctor_name'])->first();
+        if (is_null($doctor_id))
+            return $this->sendError('پزشکی با نام '. $request['doctor_name'] .' یافت نشد.', 'پزشکی با نام '. $request['doctor_name'] .' یافت نشد.');
+
+        $comment = DB::table('comments')
+            ->join('users', 'comments.user_id', '=', 'users.id')
+            ->join('doctors', 'comments.doctor_id', '=', 'doctors.id')
+            ->where('comments.doctor_id', '=', $doctor_id['id'])
+            ->select('users.first_name as User First Name', 'users.last_name as User Last Name', 'doctors.name as Doctor Name', 'comments.description')
+            ->get();
+        return $this->sendResponse($comment, 'نظرات کاربران برای دکتر '. $doctor_id['name'] .' یافت شد.');
+    }
 }
