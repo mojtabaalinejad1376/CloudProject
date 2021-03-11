@@ -279,4 +279,32 @@ class RegisterController extends BaseController
             return $this->sendResponse('دکتر '. $doctor_id['name'] .' به پزشکان مورد علاقه کاربر '. $user_id['first_name'] .' '. $user_id['last_name'] .' با موفقیت اضافه شد', 'دکتر '. $doctor_id['name'] .' به پزشکان مورد علاقه کاربر '. $user_id['first_name'] .' '. $user_id['last_name'] .' با موفقیت اضافه شد');
         }
     }
+
+    public function show_favourite(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|numeric|min:11',
+        ],
+            [
+                'phone.required' => 'لطفا شماره تلفن را وارد نماييد',
+                'phone.numeric' => 'لطفا شماره تلفن را به صورت عددی وارد نماييد',
+                'phone.min' => 'شماره تلفن نباید کمتر از 10 رقم باشد',
+            ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+        }
+
+        $user_id = User::wherePhone($request['phone'])->first();
+        if (is_null($user_id))
+            return $this->sendError('کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.', 'کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.');
+
+        $favourite = DB::table('favourites')
+            ->join('users', 'favourites.user_id', '=', 'users.id')
+            ->join('doctors', 'favourites.doctor_id', '=', 'doctors.id')
+            ->where('favourites.user_id', '=', $user_id['id'])
+            ->select('users.first_name as First Name', 'users.last_name as Last Name', 'doctors.name as Doctor Name')
+            ->get();
+        return $this->sendResponse($favourite, 'پزشکان مورد علاقه برای کاربر '.$user_id['first_name'] .' '. $user_id['last_name'] .' یافت شد.');
+    }
 }
