@@ -82,7 +82,7 @@ class DoctorController extends BaseController
         }
         elseif (isset($request['degree']))
         {
-            $doctor = Doctor::whereDegree($request['degree'])->get();
+            $doctor = Doctor::where('degree','LIKE','%'.$request['degree'].'%')->get();
             if (isset($doctor))
                 return $this->sendResponse($doctor, 'پزشک با مدرک تحصیلی '. $request['degree'] .' یافت شد.');
             else
