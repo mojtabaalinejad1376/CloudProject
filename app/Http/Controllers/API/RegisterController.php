@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Doctor;
 use App\Models\User;
+use App\Models\VisitTime;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use Illuminate\Support\Facades\Auth;
@@ -167,5 +168,44 @@ class RegisterController extends BaseController
             else
                 return $this->sendError('پزشکی با مدرک تحصیلی '. $request['degree'] .' یافت نشد.', 'پزشکی با مدرک تحصیلی '. $request['degree'] .' یافت نشد.');
         }
+    }
+
+    public function request_visit_time(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|numeric|min:11',
+            'visit_id' => 'required|numeric'
+        ],
+            [
+                'phone.required' => 'لطفا شماره تلفن را وارد نماييد',
+                'phone.numeric' => 'لطفا شماره تلفن را به صورت عددی وارد نماييد',
+                'phone.min' => 'شماره تلفن نباید کمتر از 10 رقم باشد',
+                'visit_id.required' => 'لطفا ایدی زمان ویزیت را وارد نماييد',
+                'visit_id.numeric' => 'لطفا آیدی زمان ویزیت را به صورت عددی وارد نماييد',
+            ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+        }
+
+        $user_id = User::wherePhone($request['phone'])->first();
+        if (is_null($user_id))
+            return $this->sendError('کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.', 'کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.');
+        $visit_flag = VisitTime::whereId($request['visit_id'])->first();
+        if (is_null($visit_flag))
+            return $this->sendError('زمان ویزیتی با آیدی '. $request['visit_id'] .' یافت نشد.', 'زمان ویزیتی با آیدی '. $request['visit_id'] .' یافت نشد.');
+        if ($visit_flag['visit'] == '0')
+        {
+            $time_request = \App\Models\Request::create([
+                'user_id' => $user_id['id'],
+                'visit_id' => $request['visit_id']
+            ]);
+            $visit = VisitTime::whereId($request['visit_id'])->update([
+               'visit' => '1'
+            ]);
+            return $this->sendResponse('زمان ویزیت ثبت شد.', 'زمان ویزیت در تاریخ '. $visit_flag['year'] .'/'. $visit_flag['month'] .'/'. $visit_flag['day'] .' ساعت '. $visit_flag['hour'] .' برای کاربر '. $user_id['first_name'] .' '. $user_id['last_name'] .' ثبت شد.');
+        }
+        else
+            return $this->sendError('زمان ویزیت با آیدی '. $request['visit_id'] .' قبلا رزرو شده است.', 'زمان ویزیت با آیدی '. $request['visit_id'] .' قبلا رزرو شده است.');
     }
 }
