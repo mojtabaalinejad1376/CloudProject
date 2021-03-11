@@ -19,6 +19,7 @@ class CreateVisitTimeTable extends Migration
             $table->string('month');
             $table->string('day');
             $table->string('hour');
+            $table->string('visit')->default('0');
             $table->foreignId('doctor_id')->constrained();
             $table->timestamps();
         });
