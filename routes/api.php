@@ -33,3 +33,4 @@ Route::post('create-visit-time', [VisitTimeController::class, 'create_visit_time
 Route::post('show-visit-time', [DoctorController::class, 'show_visit_time']);
 Route::post('request-visit-time', [RegisterController::class, 'request_visit_time']);
 Route::post('show-user-visit', [RegisterController::class, 'show_request_visit']);
+Route::post('create-favourite', [RegisterController::class, 'favourite']);

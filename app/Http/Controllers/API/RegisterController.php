@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Doctor;
+use App\Models\Favourite;
 use App\Models\User;
 use App\Models\VisitTime;
 use Illuminate\Http\Request;
@@ -237,5 +238,45 @@ class RegisterController extends BaseController
             ->select('users.first_name', 'users.last_name', 'visit_time.year', 'visit_time.month', 'visit_time.day', 'visit_time.hour', 'doctors.name as doctor_name')
             ->get();
         return $this->sendResponse($show, 'زمان های ویزیت رزرو شده برای کاربر '.$user_id['first_name'] .' '. $user_id['last_name'] .' یافت شد.');
+    }
+
+    public function favourite(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'doctor_name' => 'required|string',
+            'phone' => 'required|numeric|min:11',
+        ],
+            [
+                'doctor_name.required' => 'لطفا نام پزشک را وارد نماييد',
+                'doctor_name.string' => 'لطفا نام کامل پزشک را به صورت رشته وارد نماييد',
+                'phone.required' => 'لطفا شماره تلفن را وارد نماييد',
+                'phone.numeric' => 'لطفا شماره تلفن را به صورت عددی وارد نماييد',
+                'phone.min' => 'شماره تلفن نباید کمتر از 10 رقم باشد',
+            ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+        }
+
+        $user_id = User::wherePhone($request['phone'])->first();
+        if (is_null($user_id))
+            return $this->sendError('کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.', 'کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.');
+
+        $doctor_id = Doctor::whereName($request['doctor_name'])->first();
+        if (is_null($doctor_id))
+            return $this->sendError('پزشکی با نام '. $request['doctor_name'] .' یافت نشد.', 'پزشکی با نام '. $request['doctor_name'] .' یافت نشد.');
+
+        $flag = Favourite::where('user_id', $user_id['id'])->where('doctor_id', $doctor_id['id'])->get();
+
+        if (isset($flag))
+            return $this->sendError('قبلا به لیست پزشکان مورد علاقه اضافه شده است.', 'قبلا به لیست پزشکان مورد علاقه اضافه شده است.');
+        else
+        {
+            Favourite::create([
+                'user_id' => $user_id['id'],
+                'doctor_id' => $doctor_id['id']
+            ]);
+            return $this->sendResponse('دکتر '. $doctor_id['name'] .' به پزشکان مورد علاقه کاربر '. $user_id['first_name'] .' '. $user_id['last_name'] .' با موفقیت اضافه شد', 'دکتر '. $doctor_id['name'] .' به پزشکان مورد علاقه کاربر '. $user_id['first_name'] .' '. $user_id['last_name'] .' با موفقیت اضافه شد');
+        }
     }
 }
