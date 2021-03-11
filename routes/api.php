@@ -31,3 +31,4 @@ Route::post('create-doctor', [DoctorController::class, 'create']);
 Route::post('filter-doctor', [RegisterController::class, 'filter']);
 Route::post('create-visit-time', [VisitTimeController::class, 'create_visit_time']);
 Route::post('show-visit-time', [DoctorController::class, 'show_visit_time']);
+Route::post('request-visit-time', [RegisterController::class, 'request_visit_time']);
