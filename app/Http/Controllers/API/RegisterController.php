@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Comment;
 use App\Models\Doctor;
 use App\Models\Favourite;
 use App\Models\User;
@@ -306,5 +307,42 @@ class RegisterController extends BaseController
             ->select('users.first_name as First Name', 'users.last_name as Last Name', 'doctors.name as Doctor Name')
             ->get();
         return $this->sendResponse($favourite, 'پزشکان مورد علاقه برای کاربر '.$user_id['first_name'] .' '. $user_id['last_name'] .' یافت شد.');
+    }
+
+    public function comment(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'doctor_name' => 'required|string',
+            'phone' => 'required|numeric|min:11',
+            'description' => 'required|string'
+        ],
+            [
+                'doctor_name.required' => 'لطفا نام پزشک را وارد نماييد',
+                'doctor_name.string' => 'لطفا نام کامل پزشک را به صورت رشته وارد نماييد',
+                'phone.required' => 'لطفا شماره تلفن را وارد نماييد',
+                'phone.numeric' => 'لطفا شماره تلفن را به صورت عددی وارد نماييد',
+                'phone.min' => 'شماره تلفن نباید کمتر از 10 رقم باشد',
+                'description.required' => 'لطفا متن نظر خود را وارد نماييد',
+                'description.string' => 'لطفا متن نظر خود را به صورت رشته وارد نماييد',
+            ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+        }
+
+        $user_id = User::wherePhone($request['phone'])->first();
+        if (is_null($user_id))
+            return $this->sendError('کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.', 'کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.');
+
+        $doctor_id = Doctor::whereName($request['doctor_name'])->first();
+        if (is_null($doctor_id))
+            return $this->sendError('پزشکی با نام '. $request['doctor_name'] .' یافت نشد.', 'پزشکی با نام '. $request['doctor_name'] .' یافت نشد.');
+
+        Comment::create([
+           'user_id' => $user_id['id'],
+           'doctor_id' => $doctor_id['id'],
+           'description' => $request['description']
+        ]);
+        return $this->sendResponse('نظر شما با موفقیت ثبت شد.', 'نظر کاربر '.$user_id['first_name'] .' '. $user_id['last_name'] .' برای دکتر '. $doctor_id['name'] .' با موفقیت اضافه شد.');
     }
 }
