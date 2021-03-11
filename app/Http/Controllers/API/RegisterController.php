@@ -372,4 +372,32 @@ class RegisterController extends BaseController
             ->get();
         return $this->sendResponse($comment, 'نظرات کاربران برای دکتر '. $doctor_id['name'] .' یافت شد.');
     }
+
+    public function show_user_comment(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|numeric|min:11',
+        ],
+            [
+                'phone.required' => 'لطفا شماره تلفن را وارد نماييد',
+                'phone.numeric' => 'لطفا شماره تلفن را به صورت عددی وارد نماييد',
+                'phone.min' => 'شماره تلفن نباید کمتر از 10 رقم باشد',
+            ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+        }
+
+        $user_id = User::wherePhone($request['phone'])->first();
+        if (is_null($user_id))
+            return $this->sendError('کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.', 'کاربری با شماره تلفن '. $request['phone'] .' یافت نشد.');
+
+        $comment = DB::table('comments')
+            ->join('users', 'comments.user_id', '=', 'users.id')
+            ->join('doctors', 'comments.doctor_id', '=', 'doctors.id')
+            ->where('comments.user_id', '=', $user_id['id'])
+            ->select('users.first_name as User First Name', 'users.last_name as User Last Name', 'doctors.name as Doctor Name', 'comments.description')
+            ->get();
+        return $this->sendResponse($comment, 'نظرات داده شده کاربر با نام '. $user_id['first_name'] .' '. $user_id['last_name'] .' برای پزشکان یافت شد.');
+    }
 }
