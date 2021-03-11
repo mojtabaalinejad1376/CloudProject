@@ -266,7 +266,7 @@ class RegisterController extends BaseController
         if (is_null($doctor_id))
             return $this->sendError('پزشکی با نام '. $request['doctor_name'] .' یافت نشد.', 'پزشکی با نام '. $request['doctor_name'] .' یافت نشد.');
 
-        $flag = Favourite::where('user_id', $user_id['id'])->where('doctor_id', $doctor_id['id'])->get();
+        $flag = Favourite::where('user_id', $user_id['id'])->Where('doctor_id', $doctor_id['id'])->first();
 
         if (isset($flag))
             return $this->sendError('قبلا به لیست پزشکان مورد علاقه اضافه شده است.', 'قبلا به لیست پزشکان مورد علاقه اضافه شده است.');
