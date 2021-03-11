@@ -74,7 +74,7 @@ class DoctorController extends BaseController
         }
         elseif (isset($request['speciality']))
         {
-            $doctor = Doctor::whereSpeciality($request['speciality'])->get();
+            $doctor = Doctor::where('speciality','LIKE','%'.$request['speciality'].'%')->get();
             if (isset($doctor))
                 return $this->sendResponse($doctor, 'پزشک با تخصص کاری '. $request['speciality'] .' یافت شد.');
             else
