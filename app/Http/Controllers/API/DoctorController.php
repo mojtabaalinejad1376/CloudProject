@@ -50,7 +50,7 @@ class DoctorController extends BaseController
     {
         if (isset($request['name']))
         {
-            $doctor = Doctor::whereName($request['name'])->first();
+            $doctor = Doctor::where('name','LIKE','%'.$request['name'].'%')->first();
             if (isset($doctor))
                 return $this->sendResponse($doctor, 'دکتر '. $doctor['name'] .' یافت شد.');
             else
