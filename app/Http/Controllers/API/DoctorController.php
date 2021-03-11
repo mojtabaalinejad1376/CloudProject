@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class DoctorController extends BaseController
@@ -44,5 +45,30 @@ class DoctorController extends BaseController
 
         $doctor = Doctor::create($request->all());
         return $this->sendResponse($doctor, 'دکتر '. $doctor['name'] .' ثبت شد');
+    }
+
+    public function show_visit_time(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'doctor_name' => 'required|string',
+        ],
+        [
+            'doctor_name.required' => 'لطفا نام پزشک را وارد نماييد',
+            'doctor_name.string' => 'لطفا نام کامل پزشک را به صورت رشته وارد نماييد',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('خطا اعتبارسنجی', $validator->errors());
+        }
+
+        $doctor_id = Doctor::whereName($request['doctor_name'])->first();
+        if (is_null($doctor_id))
+            return $this->sendError('پزشکی با نام '. $request['doctor_name'] .' یافت نشد.', 'پزشکی با نام '. $request['doctor_name'] .' یافت نشد.');
+
+        $visit = DB::table('doctors')
+            ->join('visit_time', 'doctors.id', '=', 'visit_time.doctor_id')
+            ->select('visit_time.id', 'doctors.name', 'visit_time.year', 'visit_time.month', 'visit_time.day', 'visit_time.hour', 'visit_time.visit')
+            ->get();
+        return $this->sendResponse($visit, 'زمان های ویزیت برای پزشک '. $request['doctor_name'] .' یافت شد.');
     }
 }
